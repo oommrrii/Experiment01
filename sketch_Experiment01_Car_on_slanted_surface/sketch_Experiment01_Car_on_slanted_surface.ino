@@ -23,7 +23,7 @@ const int rearEchoPin = 9;
 // defines  Sonar variables
 float Distance[2] = {0.1,0.1}; //0 for front distance; 1 for rear distance
 
-float Previous_distance = 0, dt = 1/5.5; //algorithm works at 5.5 Hz
+float Previous_distance = 0, Previous_velocity = 0, dt = 1/5.5; //algorithm works at 5.5 Hz
 
 int count = 0, Time;
 
@@ -251,6 +251,19 @@ if (count==100){
   while(1);
 }
 */
+
+if (count>100 && count <110)
+drive(-80,-80);
+if (count>110 && count <125)
+drive(-60,-60);
+if (count>125 && count <230)
+drive(0,0);
+if (count>230 && count <240)
+drive(80,80);
+if (count>240 && count <255)
+drive(60,60);
+if (count==255)
+drive(0,0);
 // ########################### Algorithm #############################
 
 // Prediction
@@ -368,7 +381,11 @@ Matrix.Print((float*)P, N, N, "P");
   
 // Ploting measurement
 float Velocity = (*Distance_meassured - Previous_distance)/dt; // Numerical calculation for velocity
+float Acceleration1 = (Velocity - Previous_velocity)/dt; // Numerical calculation for acceleration
+float Acceleration2 = (*Distance_meassured - Previous_distance)/dt/dt; // Numerical calculation for acceleration
+
 Previous_distance = *Distance_meassured; // Save distance for next iteration
+Previous_velocity = Velocity; // Save velocity for next iteration
 
 Serial.print(*Distance_meassured);
 Serial.print(",");
@@ -376,7 +393,13 @@ Serial.print(X[0]);
 Serial.print(",");
 Serial.print(Velocity);
 Serial.print(",");
-Serial.println(X[1]);
+Serial.print(X[1]);
+Serial.print(",");
+//Serial.print(Acceleration1);
+//Serial.print(",");
+Serial.print(Acceleration2);
+Serial.print(",");
+Serial.println(X[2]);
 /*
 if (count==0)
 Time = micros();
