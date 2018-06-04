@@ -33,22 +33,22 @@ int count = 0, Time;
 // Motion model
 float A[N][N] = {{1,dt,0},{0,1,dt},{0,0,1}};
 float At[N][N], Bt[N];
-float B[N] = {0,0,dt};
-float u = 0.01;//9.8 * 0.33/1.20; //Projection of gravity [m/s^2]
+float B[N] = {dt/5000,0,0};
+float u = 0.0;//9.8 * 0.33/1.20; //Projection of gravity [m/s^2]
 float U[1] = {u};
 float X_[N], temp_vec[N], temp_vec3[N];
-float X[N] = {0.05,0,u}; //Initial conditions
+float X[N] = {0.05,u,0}; //Initial conditions
 
 // Measurement model
 float H[1][N] = {{1,0,0}};
 float Ht[N][1];
 float D[N] = {1,0,0};
 float n = 0.05; //sensor noise [m]
-float Z[1] = {0}; //Initialize measurement
+float Z[1] = {0.05}; //Initialize measurement
 
 // Error covariance
 float P[N][N] = {{0.05,0,0},{0,0.05,0},{0,0,0.1}}; //Initial conditions [m]
-float Pn[1] = {0.10}; //[m]
+float Pn[1] = {0.01}; //motion model noise error covariance[m]
 float P_[N][N], temp_mat[N][N], temp_mat2[N][N];
 float R[1] = {0.05}; //sensor error covariance[m]
 
@@ -253,17 +253,19 @@ if (count==100){
 */
 
 if (count>100 && count <110)
-drive(-80,-80);
+U[0]=-80;
 if (count>110 && count <125)
-drive(-60,-60);
+U[0]=-60;
 if (count>125 && count <230)
-drive(0,0);
+U[0]=0;
 if (count>230 && count <240)
-drive(80,80);
+U[0]=80;
 if (count>240 && count <255)
-drive(60,60);
+U[0]=60;
 if (count==255)
-drive(0,0);
+U[0]=0;
+// Execution
+drive(U[0],U[0]);
 // ########################### Algorithm #############################
 
 // Prediction
@@ -387,19 +389,21 @@ float Acceleration2 = (*Distance_meassured - Previous_distance)/dt/dt; // Numeri
 Previous_distance = *Distance_meassured; // Save distance for next iteration
 Previous_velocity = Velocity; // Save velocity for next iteration
 
-Serial.print(*Distance_meassured);
+Serial.print(*temp_scal2);
 Serial.print(",");
+//Serial.print(*Distance_meassured);
+//Serial.print(",");
 Serial.print(X[0]);
 Serial.print(",");
-Serial.print(Velocity);
-Serial.print(",");
-Serial.print(X[1]);
-Serial.print(",");
+//Serial.print(Velocity);
+//Serial.print(",");
+Serial.println(X[1]);
+//Serial.print(",");
 //Serial.print(Acceleration1);
 //Serial.print(",");
-Serial.print(Acceleration2);
-Serial.print(",");
-Serial.println(X[2]);
+//Serial.print(Acceleration2);
+//Serial.print(",");
+//Serial.println(X[2]);
 /*
 if (count==0)
 Time = micros();
